@@ -1,0 +1,24 @@
+{
+  "guid": "86732ba2-a4ae-4f75-8a07-12da148ad827",
+  "name": "guided_oceanFFT_SYCLMigration",
+  "categories": ["Toolkit/oneAPI Direct Programming/DPC++/SpectralMethods"],
+  "description": "OceanFFT is a simulation of ocean waves/height field using FFT.  CUDA oceanFFT with cuFFT sample is migrated to SYCL heterogenous programming language",
+  "toolchain": [ "dpcpp" ],
+  "languages": [ { "cpp": {} } ],
+  "targetDevice": [ "CPU", "GPU" ],
+  "os": [ "linux" ],
+  "builder": [ "cmake" ],
+  "ciTests": {
+        "linux": [{
+                "steps": [
+                        "mkdir build",
+                        "cd build",
+                        "cmake ..",
+                        "make",
+                        "make run_cpu",
+                        "make run_gpu"
+                 ]
+        }]
+
+  }
+}
