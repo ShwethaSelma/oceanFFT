@@ -48,7 +48,7 @@ Prolongation is performed with bilinear interpolation followed by scaling. and a
 This sample application demonstrates the CUDA HSOptical Flow Estimation using key concepts such as Image processing, Texture memory, shared memory, and cooperative groups.
 
 
-## Build the `HSOpticalFlow` Sample for CPU and GPU
+## Build the `OceanFFT` Sample for CPU and GPU
 
 When working with the command-line interface (CLI), you should configure the oneAPI toolkits using environment variables. Set up your CLI environment by sourcing the `setvars` script every time you open a new terminal window. This practice ensures that your compiler, libraries, and tools are ready for development.
 
