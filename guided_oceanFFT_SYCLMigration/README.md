@@ -12,10 +12,9 @@
 
 ## Purpose
 
-Optical flow method is based on two assumptions: brightness constancy and spatial
-flow smoothness. These assumptions are combined in a single energy functional and
-solution is found as its minimum point. The sample includes
-both parallel and serial computation, which allows for direct results comparison. The parallel implementation demonstrates the use of Texture memory, shared memory, and cooperative groups. Input to the sample is two image frames and output is the absolute difference value(L1 error) between seriel and parallel computation.
+Ocean is made of many waves all added together. The main principle of Ocean rendering is that it can be modelled as sum of infinite waves at different amplitudes travelling in different directions. So in order to simulate ocean waves, we need to be able to sample the height at any 2D point in the world. First step is to generate an image of the Ocean in the frequency domain and then by running it through the FFT, get the data in the spatial domain. Once the data is in spatial domain get the height displacement value.
+This OceanFFT SYCL application demonstrates the ocean wave simulation using oneMKL DFT  library and uses image processing key concept. Intel® oneAPI Math Kernel Library (oneMKL) provides a DPC++ interface for computing a discrete Fourier transform through the fast Fourier transform algorithm. The DPC++ interface emulates the usage model of the oneMKL C and Fortran Discrete Fourier Transform Interface (DFTI).
+
 
 This sample contains four versions:
 
