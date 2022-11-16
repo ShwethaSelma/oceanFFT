@@ -13,6 +13,7 @@
 ## Purpose
 
 Ocean is made of many waves all added together. The main principle of Ocean rendering is that it can be modelled as sum of infinite waves at different amplitudes travelling in different directions. So in order to simulate ocean waves, we need to be able to sample the height at any 2D point in the world. First step is to generate an image of the Ocean in the frequency domain and then by running it through the FFT, get the data in the spatial domain. Once the data is in spatial domain get the height displacement value.
+
 This OceanFFT SYCL application demonstrates the ocean wave simulation using oneMKL DFT  library and uses image processing key concept. Intel® oneAPI Math Kernel Library (oneMKL) provides a DPC++ interface for computing a discrete Fourier transform through the fast Fourier transform algorithm. The DPC++ interface emulates the usage model of the oneMKL C and Fortran Discrete Fourier Transform Interface (DFTI).
 
 
