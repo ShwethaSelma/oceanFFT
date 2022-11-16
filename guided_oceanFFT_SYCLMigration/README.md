@@ -34,18 +34,9 @@ This sample contains four versions:
 
 ## Key Implementation Details
 
-HSOptical flow involves following : Image downscaling and upscaling, image warping, computing derivatives, and computation of jacobi iteration.
-Image scaling downscaling or upscaling aims to preserve the visual appearance of the original image when it is resized, without changing the amount of data in that image. An image with a resolution of width×height will be resized to new_width×new_height with a scale factor. A scale factor less than 1 indicates shrinking while a scale factor greater than 1 indicates stretching.
+In the OceanFFT sample ocean waves/height field is simulated using FFT. This sample uses oneMKL DFT calls to synthesize and render an ocean surface in real-time. FFT transfers the data from the frequency domain to spatial domain to obtain the height displacement value. 
 
-Image warping is a transformation which maps all positions in source image plane to positions in a destination plane. Texture addressing mode is set to Clamp, texture coordinates are unnormalized. Clamp addressing mode to handle out-of-range coordinates. It eases computing derivatives and warping whenever we need to reflect out-of-range coordinates across borders.
-Once the warped image is created, derivatives is computed. For each pixel the required stencil points from texture are fetched and convolved them with filter kernel. In terms of CUDA we can create a thread for each pixel. This thread fetches required data and computes derivative.
-
-Next step employs several Jacobi iterations, Border conditions are explicitly handled within the kernel. The number of iterations is held fixed during computations. This eliminates the need for checking error on every iteration. The required number of iterations can be determined experimentally.
-To perform one iteration of Jacobi method in a particular point we need to know results of previous iteration for its four neighbors. If we simply load these values from global memory each value will be loaded four times. We store these values in shared memory. This approach significantly reduces number of global memory accesses, provides better coalescing, and improves overall performance.
-
-Prolongation is performed with bilinear interpolation followed by scaling. and are handled independently. For each output pixel there is a thread which fetches output value from the texture and scales it.
-
-This sample application demonstrates the CUDA HSOptical Flow Estimation using key concepts such as Image processing, Texture memory, shared memory, and cooperative groups.
+The implementation involves creation of FFT data using the `mkl::dft::descriptor` api and initiates it with default configuration. Next step is to generate wave spectrum frequency domain based on initial heightfield and dispersion relationship, and then the data is ran through inverse FFT(`dft::compute_forward / dft::compute_backward`) to get the data in spatial domain from frequency domain. Based on the FFT output the height field values are updated. Final step is to calculate the slope for shading by partial difference in spacial domain.
 
 
 ## Build the `OceanFFT` Sample for CPU and GPU
