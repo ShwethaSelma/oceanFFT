@@ -52,12 +52,13 @@
 #endif
 
 // includes
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <CL/sycl.hpp>
 #include <dpct/dpct.hpp>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include <oneapi/mkl.hpp>
 #define SYCLRT_PI_F 3.141592654f
 #define SYCLRT_SQRT_HALF_F 0.707106781f
@@ -93,9 +94,9 @@ bool animate = true;
 std::shared_ptr<oneapi::mkl::dft::descriptor<
     oneapi::mkl::dft::precision::SINGLE, oneapi::mkl::dft::domain::COMPLEX>>
     fftPlan;
-sycl::float2 *d_h0 = 0; // heightfield at time 0
+sycl::float2 *d_h0 = 0;  // heightfield at time 0
 sycl::float2 *h_h0 = 0;
-sycl::float2 *d_ht = 0; // heightfield at time t
+sycl::float2 *d_ht = 0;  // heightfield at time t
 sycl::float2 *d_slope = 0;
 
 // pointers to device object
@@ -150,11 +151,10 @@ void generate_h0(sycl::float2 *h0);
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
 int main() {
-
-    animate = false;
-    fpsLimit = frameCheckNumber;
-    runAutoTest();
-    exit(EXIT_SUCCESS);
+  animate = false;
+  fpsLimit = frameCheckNumber;
+  runAutoTest();
+  exit(EXIT_SUCCESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,12 +166,12 @@ void runAutoTest() {
   printf("Starting...\n\n");
 
   std::cout << "Device: "
-<< q_ct1.get_device().get_info<sycl::info::device::name>()
-<< std::endl;
-  
+            << q_ct1.get_device().get_info<sycl::info::device::name>()
+            << std::endl;
+
   dpct::device_info deviceProp;
   dev_ct1.get_device_info(deviceProp);
- 
+
   printf("Compute capability %d.%d\n", deviceProp.get_major_version(),
          deviceProp.get_minor_version());
 
@@ -182,20 +182,20 @@ void runAutoTest() {
 
   // allocate memory
   int spectrumSize = spectrumW * spectrumH * sizeof(sycl::float2);
-  
+
   d_h0 = (sycl::float2 *)sycl::malloc_device(spectrumSize, q_ct1);
   h_h0 = (sycl::float2 *)malloc(spectrumSize);
   generate_h0(h_h0);
- 
+
   q_ct1.memcpy(d_h0, h_h0, spectrumSize).wait();
 
   int outputSize = meshSize * meshSize * sizeof(sycl::float2);
-  
+
   d_ht = (sycl::float2 *)sycl::malloc_device(outputSize, q_ct1);
   d_slope = (sycl::float2 *)sycl::malloc_device(outputSize, q_ct1);
 
   auto startDeviceTime = Time::now();
-  
+
   char test_exepath[] = "./a.out";
   runSyclTest(test_exepath);
 
@@ -203,12 +203,12 @@ void runAutoTest() {
   auto Device_duration =
       std::chrono::duration_cast<float_ms>(stopDeviceTime - startDeviceTime)
           .count();
- printf("Processing time : %f (ms)\n", Device_duration);
- 
- sycl::free(d_ht, q_ct1);
- sycl::free(d_slope, q_ct1);
- sycl::free(d_h0, q_ct1);
- free(h_h0);
+  printf("Processing time : %f (ms)\n", Device_duration);
+
+  sycl::free(d_ht, q_ct1);
+  sycl::free(d_slope, q_ct1);
+  sycl::free(d_h0, q_ct1);
+  free(h_h0);
 
   exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }
@@ -291,7 +291,7 @@ void generate_h0(sycl::float2 *h0) {
 void runSyclTest(char *exec_path) {
   dpct::device_ext &dev_ct1 = dpct::get_current_device();
   sycl::queue &q_ct1 = dev_ct1.default_queue();
-  
+
   g_hptr = sycl::malloc_device<float>(meshSize * meshSize, q_ct1);
   g_sptr = sycl::malloc_device<sycl::float2>(meshSize * meshSize, q_ct1);
 
@@ -300,13 +300,12 @@ void runSyclTest(char *exec_path) {
                              animTime, patchSize);
 
   // execute inverse FFT to convert to spatial domain
-    fftPlan->commit(q_ct1);
-    if ((void *)d_ht == (void *)d_ht) {
-      oneapi::mkl::dft::compute_backward(*fftPlan, (float *)d_ht);
-    } else {
-      oneapi::mkl::dft::compute_backward(*fftPlan, (float *)d_ht,
-                                         (float *)d_ht);
-    }
+  fftPlan->commit(q_ct1);
+  if ((void *)d_ht == (void *)d_ht) {
+    oneapi::mkl::dft::compute_backward(*fftPlan, (float *)d_ht);
+  } else {
+    oneapi::mkl::dft::compute_backward(*fftPlan, (float *)d_ht, (float *)d_ht);
+  }
 
   // update heightmap values
   syclUpdateHeightmapKernel(g_hptr, d_ht, meshSize, meshSize, true);
@@ -354,5 +353,3 @@ void runSyclTest(char *exec_path) {
   sycl::free(g_hptr, q_ct1);
   sycl::free(g_sptr, q_ct1);
 }
-
-

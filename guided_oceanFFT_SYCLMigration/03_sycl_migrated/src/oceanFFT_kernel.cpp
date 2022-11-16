@@ -146,14 +146,13 @@ void calculateSlopeKernel(float *h, sycl::float2 *slopeOut, unsigned int width,
 }
 
 // wrapper functions
-extern "C" void syclGenerateSpectrumKernel(sycl::float2 *d_h0,
-                                           sycl::float2 *d_ht,
-                                           unsigned int in_width,
-                                           unsigned int out_width,
-                                           unsigned int out_height,
-                                           float animTime, float patchSize, queue q) {
+extern "C" void syclGenerateSpectrumKernel(
+    sycl::float2 *d_h0, sycl::float2 *d_ht, unsigned int in_width,
+    unsigned int out_width, unsigned int out_height, float animTime,
+    float patchSize, queue q) {
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -161,7 +160,7 @@ extern "C" void syclGenerateSpectrumKernel(sycl::float2 *d_h0,
   }
   sycl::range<3> grid(1, sycl_iDivUp(out_height, block[1]),
                       sycl_iDivUp(out_width, block[2]));
-  
+
   q.parallel_for(
       sycl::nd_range<3>(grid * block, block), [=](sycl::nd_item<3> item_ct1) {
         generateSpectrumKernel(d_h0, d_ht, in_width, out_width, out_height,
@@ -172,10 +171,11 @@ extern "C" void syclGenerateSpectrumKernel(sycl::float2 *d_h0,
 extern "C" void syclUpdateHeightmapKernel(float *d_heightMap,
                                           sycl::float2 *d_ht,
                                           unsigned int width,
-                                          unsigned int height, bool autoTest, queue q) {
-
+                                          unsigned int height, bool autoTest,
+                                          queue q) {
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -189,10 +189,10 @@ extern "C" void syclUpdateHeightmapKernel(float *d_heightMap,
           updateHeightmapKernel_y(d_heightMap, d_ht, width, item_ct1);
         });
   } else {
-    q.parallel_for(
-        sycl::nd_range<3>(grid * block, block), [=](sycl::nd_item<3> item_ct1) {
-          updateHeightmapKernel(d_heightMap, d_ht, width, item_ct1);
-        });
+    q.parallel_for(sycl::nd_range<3>(grid * block, block),
+                   [=](sycl::nd_item<3> item_ct1) {
+                     updateHeightmapKernel(d_heightMap, d_ht, width, item_ct1);
+                   });
   }
 }
 
@@ -200,7 +200,8 @@ extern "C" void syclCalculateSlopeKernel(float *hptr, sycl::float2 *slopeOut,
                                          unsigned int width,
                                          unsigned int height, queue q) {
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      q.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -208,7 +209,7 @@ extern "C" void syclCalculateSlopeKernel(float *hptr, sycl::float2 *slopeOut,
   }
   sycl::range<3> grid2(1, sycl_iDivUp(height, block[1]),
                        sycl_iDivUp(width, block[2]));
-  
+
   q.parallel_for(
       sycl::nd_range<3>(grid2 * block, block), [=](sycl::nd_item<3> item_ct1) {
         calculateSlopeKernel(hptr, slopeOut, width, height, item_ct1);

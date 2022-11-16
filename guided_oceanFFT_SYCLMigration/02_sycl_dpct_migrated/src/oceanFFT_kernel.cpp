@@ -153,7 +153,10 @@ extern "C" void syclGenerateSpectrumKernel(sycl::float2 *d_h0,
                                            unsigned int out_height,
                                            float animTime, float patchSize) {
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = dpct::get_default_queue().get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      dpct::get_default_queue()
+          .get_device()
+          .get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -161,7 +164,7 @@ extern "C" void syclGenerateSpectrumKernel(sycl::float2 *d_h0,
   }
   sycl::range<3> grid(1, sycl_iDivUp(out_height, block[1]),
                       sycl_iDivUp(out_width, block[2]));
-  
+
   dpct::get_default_queue().parallel_for(
       sycl::nd_range<3>(grid * block, block), [=](sycl::nd_item<3> item_ct1) {
         generateSpectrumKernel(d_h0, d_ht, in_width, out_width, out_height,
@@ -176,7 +179,9 @@ extern "C" void syclUpdateHeightmapKernel(float *d_heightMap,
   dpct::device_ext &dev_ct1 = dpct::get_current_device();
   sycl::queue &q_ct1 = dev_ct1.default_queue();
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = q_ct1.get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      q_ct1.get_device()
+          .get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -201,7 +206,10 @@ extern "C" void syclCalculateSlopeKernel(float *hptr, sycl::float2 *slopeOut,
                                          unsigned int width,
                                          unsigned int height) {
   sycl::range<3> block(1, 8, 8);
-  auto max_wg_size = dpct::get_default_queue().get_device().get_info<cl::sycl::info::device::max_work_group_size>();
+  auto max_wg_size =
+      dpct::get_default_queue()
+          .get_device()
+          .get_info<cl::sycl::info::device::max_work_group_size>();
   if (max_wg_size < block[1] * block[2]) {
     block[0] = 1;
     block[2] = 8;
@@ -209,7 +217,7 @@ extern "C" void syclCalculateSlopeKernel(float *hptr, sycl::float2 *slopeOut,
   }
   sycl::range<3> grid2(1, sycl_iDivUp(height, block[1]),
                        sycl_iDivUp(width, block[2]));
-  
+
   dpct::get_default_queue().parallel_for(
       sycl::nd_range<3>(grid2 * block, block), [=](sycl::nd_item<3> item_ct1) {
         calculateSlopeKernel(hptr, slopeOut, width, height, item_ct1);
